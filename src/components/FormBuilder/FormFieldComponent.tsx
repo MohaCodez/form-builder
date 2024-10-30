@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FormField } from '../../types/form';
+import { FormField, Option } from '../../types/form';
 import { useFormStore } from '../../store/formStore';
 import { Grip, X } from 'lucide-react';
 
@@ -31,6 +31,16 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
     transition,
   };
 
+  const handleCheckboxChange = (optionValue: string) => {
+    const updatedOptions = field.options?.map((option) => {
+      if (option.value === optionValue) {
+        return { ...option, checked: !option.checked }; // Toggle checked state
+      }
+      return option;
+    });
+    updateField(field.id, { options: updatedOptions });
+  };
+
   const renderField = () => {
     switch (field.type) {
       case 'text':
@@ -52,35 +62,41 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
         return (
           <select className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2">
             <option value="">Select an option</option>
-            {field.options?.map((option) => (
-              <option key={option} value={option}>
-                {option}
+            {field.options?.map((option: Option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
         );
       case 'checkbox':
         return (
-          <input
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
+          <div className="space-y-2">
+            {field.options?.map((option: Option) => (
+              <label key={option.value} className="block flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={option.checked || false}
+                  onChange={() => handleCheckboxChange(option.value)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-gray-700">{option.label}</span>
+              </label>
+            ))}
+          </div>
         );
       case 'radio':
         return (
           <div className="space-y-2">
-            {field.options?.map((option) => (
-              <label
-                key={option}
-                className="inline-flex items-center space-x-2"
-              >
+            {field.options?.map((option: Option) => (
+              <label key={option.value} className="block flex items-center space-x-2">
                 <input
                   type="radio"
                   name={field.id}
-                  value={option}
+                  value={option.value}
                   className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-gray-700">{option}</span>
+                <span className="text-gray-700">{option.label}</span>
               </label>
             ))}
           </div>
@@ -117,34 +133,26 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700">
           {field.label}
-          {field.required && (
-            <span className="text-red-500 ml-1">*</span>
-          )}
+          {field.required && <span className="text-red-500 ml-1">*</span>}
         </label>
         {renderField()}
       </div>
 
       {!preview && (
         <div className="mt-4 pt-4 border-t">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
-            Field Settings
-          </h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Field Settings</h4>
           <div className="space-y-2">
             <input
               type="text"
               value={field.label}
-              onChange={(e) =>
-                updateField(field.id, { label: e.target.value })
-              }
+              onChange={(e) => updateField(field.id, { label: e.target.value })}
               placeholder="Field Label"
               className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
             />
             <input
               type="text"
               value={field.placeholder}
-              onChange={(e) =>
-                updateField(field.id, { placeholder: e.target.value })
-              }
+              onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
               placeholder="Placeholder"
               className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
             />
@@ -152,23 +160,25 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
               <input
                 type="checkbox"
                 checked={field.required}
-                onChange={(e) =>
-                  updateField(field.id, { required: e.target.checked })
-                }
+                onChange={(e) => updateField(field.id, { required: e.target.checked })}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="ml-2 text-sm text-gray-600">Required</span>
             </label>
-            {(field.type === 'select' || field.type === 'radio') && (
+            {(field.type === 'select' || field.type === 'checkbox' || field.type === 'radio') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Options (one per line)
                 </label>
                 <textarea
-                  value={field.options?.join('\n')}
+                  value={field.options?.map((opt) => opt.label).join('\n')}
                   onChange={(e) =>
                     updateField(field.id, {
-                      options: e.target.value.split('\n').filter(Boolean),
+                      options: e.target.value.split('\n').map((opt) => ({
+                        label: opt,
+                        value: opt,
+                        checked: false,
+                      })),
                     })
                   }
                   className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"

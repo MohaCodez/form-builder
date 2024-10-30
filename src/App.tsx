@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -6,18 +6,21 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { FieldPalette } from './components/FormBuilder/FieldPalette';
 import { FormCanvas } from './components/FormBuilder/FormCanvas';
 import { useFormStore } from './store/formStore';
 import { FormField, FieldType } from './types/form';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
 import { FormFieldComponent } from './components/FormBuilder/FormFieldComponent';
+import { FormPreview } from './components/FormBuilder/FormPreview';
+import Modal from 'react-modal';
 
 function App() {
   const { activeForm, addField, reorderFields, submitForApproval } = useFormStore();
-  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -27,8 +30,8 @@ function App() {
     })
   );
 
-  const handleDragStart = (event: { active: { id: string } }) => {
-    setActiveId(event.active.id);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id.toString());
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -43,11 +46,16 @@ function App() {
         id: crypto.randomUUID(),
         type,
         label: `New ${type} field`,
-        placeholder: `Enter ${type}...`,
+
+        placeholder: (type === 'text' || type === 'textarea') ? `Enter ${type}...` : undefined, // Conditional placeholder
         required: false,
         options:
-          type === 'select' || type === 'radio'
-            ? ['Option 1', 'Option 2', 'Option 3']
+          type === 'select' || type === 'radio' || type === 'checkbox'
+            ? [
+                { label: 'Option 1', value: 'Option 1', checked: false },
+                { label: 'Option 2', value: 'Option 2', checked: false },
+                { label: 'Option 3', value: 'Option 3', checked: false },
+              ]
             : undefined,
       };
       addField(newField);
@@ -77,15 +85,30 @@ function App() {
         id: 'preview',
         type,
         label: `New ${type} field`,
-        placeholder: `Enter ${type}...`,
+        
+        
+        placeholder:`Enter ${type}...` ,
+
         required: false,
         options:
-          type === 'select' || type === 'radio'
-            ? ['Option 1', 'Option 2', 'Option 3']
+          type === 'select' || type === 'radio'|| type === 'checkbox'
+            ? [
+                { label: 'Option 1', value: 'Option 1', checked: false },
+                { label: 'Option 2', value: 'Option 2', checked: false },
+                { label: 'Option 3', value: 'Option 3', checked: false },
+              ]
             : undefined,
       };
     }
     return activeForm?.fields.find((f) => f.id === activeId) || null;
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -97,18 +120,12 @@ function App() {
               Form Builder
             </h1>
             <div className="flex items-center space-x-4">
-              {activeForm?.status === 'pending' && (
-                <div className="flex items-center text-yellow-600">
-                  <AlertTriangle className="w-5 h-5 mr-2" />
-                  <span>Pending Approval</span>
-                </div>
-              )}
-              {activeForm?.status === 'approved' && (
-                <div className="flex items-center text-green-600">
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  <span>Approved</span>
-                </div>
-              )}
+              <button
+                onClick={openModal}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Show Preview
+              </button>
               <button
                 onClick={submitForApproval}
                 disabled={
@@ -133,15 +150,17 @@ function App() {
         >
           <div className="flex gap-8">
             <FieldPalette />
-            <FormCanvas
-              fields={activeForm?.fields || []}
-            />
+            <div className="flex-1">
+              <div className="relative">
+                <FormCanvas fields={activeForm?.fields || []} />
+              </div>
+            </div>
           </div>
           <DragOverlay>
             {activeId ? (
               <div className="opacity-80">
                 <FormFieldComponent 
-                  field={getActiveField()!}
+                  field ={getActiveField()!}
                   preview
                 />
               </div>
@@ -149,6 +168,23 @@ function App() {
           </DragOverlay>
         </DndContext>
       </main>
+
+      <Modal 
+        isOpen={isModalOpen} 
+        onRequestClose={closeModal} 
+        className="modal w-3/4 mx-auto my-auto relative"
+      >
+        <div className="flex justify-between items-center p-4">
+          <h2 className="text-lg font-semibold"> </h2>
+          <button 
+            onClick={closeModal} 
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600 focus:outline-none"
+          >
+            &times;
+          </button>
+        </div>
+        <FormPreview fields={activeForm?.fields || []} />
+      </Modal>
     </div>
   );
 }
