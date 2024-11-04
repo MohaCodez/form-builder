@@ -77,7 +77,7 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
                 <input
                   type="checkbox"
                   checked={option.checked || false}
-                  onChange={() => handleCheckboxChange(option.value)}
+                  onChange={() => handleCheckboxChange(option.value)} // Update state on change
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-gray-700">{option.label}</span>
@@ -94,11 +94,28 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
                   type="radio"
                   name={field.id}
                   value={option.value}
+                  checked={option.checked || false} // Ensure the radio button reflects the checked state
+                  onChange={() => {
+                    const updatedOptions = field.options?.map((opt) => ({
+                      ...opt,
+                      checked: opt.value === option.value, // Set checked state based on selection
+                    }));
+                    updateField(field.id, { options: updatedOptions });
+                  }}
                   className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-gray-700">{option.label}</span>
               </label>
             ))}
+          </div>
+        );
+      case 'title':
+        return (
+          <div className="mb-4">
+            <h1 className="text-2xl font-bold">{field.label}</h1>
+            {field.options && field.options.length > 0 && (
+              <h2 className="text-xl font-semibold">{field.options[0].label}</h2>
+            )}
           </div>
         );
       default:

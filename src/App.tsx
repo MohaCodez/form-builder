@@ -173,9 +173,15 @@ function App() {
         isOpen={isModalOpen} 
         onRequestClose={closeModal} 
         className="modal w-3/4 mx-auto my-auto relative"
+        style={{
+          content: {
+            maxHeight: '80vh', // Set a maximum height for the modal
+            overflowY: 'hidden', // Prevent overflow on the modal itself
+          }
+        }}
       >
         <div className="flex justify-between items-center p-4">
-          <h2 className="text-lg font-semibold"> </h2>
+          <h2 className="text-lg font-semibold"></h2>
           <button 
             onClick={closeModal} 
             className="flex items-center justify-center w-8 h-8 rounded-full bg-red-500 text-white hover:bg-red-600 focus:outline-none"
@@ -183,7 +189,9 @@ function App() {
             &times;
           </button>
         </div>
-        <FormPreview fields={activeForm?.fields || []} />
+        <div className="max-h-[70vh] overflow-y-auto"> {/* Add this wrapper for scrolling */}
+          <FormPreview fields={activeForm?.fields || []} isEditable={true}/>
+        </div>
       </Modal>
     </div>
   );

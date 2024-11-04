@@ -64,6 +64,7 @@ export const FieldPalette: React.FC = () => {
       label: 'Checkbox',
     },
     { type: 'radio', icon: <Radio size={20} />, label: 'Radio Group' },
+    { type: 'title', icon: <Type size={20} />, label: 'Title' },
   ];
 
   return (
