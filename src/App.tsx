@@ -45,35 +45,23 @@ function App() {
       const newField: FormField = {
         id: crypto.randomUUID(),
         type,
-        label: `New ${type} field`,
-
-        placeholder: (type === 'text' || type === 'textarea') ? `Enter ${type}...` : undefined, // Conditional placeholder
+        label: type === 'formInformation' ? 'Information' : `New ${type} field`,
+        placeholder: type === 'formInformation' ? 'Enter your information here...' : (type === 'text' || type === 'textarea') ? `Enter ${type}...` : undefined,
         required: false,
-        options:
-          type === 'select' || type === 'radio' || type === 'checkbox'
-            ? [
-                { label: 'Option 1', value: 'Option 1', checked: false },
-                { label: 'Option 2', value: 'Option 2', checked: false },
-                { label: 'Option 3', value: 'Option 3', checked: false },
-              ]
-            : undefined,
+        subtitle: '',
+        options: type === 'select' || type === 'radio' || type === 'checkbox'
+          ? [
+              { label: 'Option 1', value: 'Option 1', checked: false },
+              { label: 'Option 2', value: 'Option 2', checked: false },
+              { label: 'Option 3', value: 'Option 3', checked: false },
+            ]
+          : undefined,
       };
       addField(newField);
-    } else if (
-      activeForm &&
-      active.id !== over.id &&
-      !active.id.toString().startsWith('palette-')
-    ) {
-      const oldIndex = activeForm.fields.findIndex(
-        (f) => f.id === active.id
-      );
-      const newIndex = activeForm.fields.findIndex(
-        (f) => f.id === over.id
-      );
-
-      reorderFields(
-        arrayMove(activeForm.fields, oldIndex, newIndex)
-      );
+    } else if (activeForm && active.id !== over.id && !active.id.toString().startsWith('palette-')) {
+      const oldIndex = activeForm.fields.findIndex((f) => f.id === active.id);
+      const newIndex = activeForm.fields.findIndex((f) => f.id === over.id);
+      reorderFields(arrayMove(activeForm.fields, oldIndex, newIndex));
     }
   };
 

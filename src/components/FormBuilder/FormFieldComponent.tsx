@@ -113,9 +113,16 @@ export const FormFieldComponent: React.FC<FormFieldComponentProps> = ({
         return (
           <div className="mb-4">
             <h1 className="text-2xl font-bold">{field.label}</h1>
-            {field.options && field.options.length > 0 && (
-              <h2 className="text-xl font-semibold">{field.options[0].label}</h2>
+            {field.subtitle && (
+              <h2 className="text-xl font-semibold">{field.subtitle}</h2>
             )}
+          </div>
+        );
+      case 'formInformation':
+        return (
+          <div className="mb-4">
+            <p className="text-gray-700">{field.label}</p>
+            <p className="mt-1 text-sm text-gray-500">{field.placeholder}</p>
           </div>
         );
       default:

@@ -1,10 +1,11 @@
-export type FieldType = 'text' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'title';
+export type FieldType = 'text' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'title' | 'formInformation';
 
 export interface FormField {
   id: string;
   type: string;
   label: string;
   placeholder?: string;
+  subtitle?: string;
   required?: boolean;
   options?: Option[]; // Ensure this is an array of Option objects
 }
