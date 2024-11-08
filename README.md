@@ -23,7 +23,7 @@ A React-based form builder application that allows users to create and manage fo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/form-builder.git
+   git clone https://github.com/MohaCodez/form-builder.git
    cd form-builder
    ```
 
