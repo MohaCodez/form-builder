@@ -1,5 +1,6 @@
-import { create } from 'zustand';
-import { FormField, Form } from '../types/form';
+import { create } from "zustand";
+import { FormField, Form } from "../types/form";
+import { formService } from "../services/formServices";
 
 interface FormStore {
   forms: Form[];
@@ -11,15 +12,18 @@ interface FormStore {
   reorderFields: (fields: FormField[]) => void;
   submitForApproval: () => void;
   createNewForm: () => void;
+  saveForm: () => Promise<void>;
+  loadForms: () => Promise<void>;
+  deleteForm: (formId: string) => Promise<void>;
 }
 
-export const useFormStore = create<FormStore>((set) => ({
+export const useFormStore = create<FormStore>((set, get) => ({
   forms: [],
   activeForm: {
     id: crypto.randomUUID(),
-    name: 'Untitled Form',
+    name: "Untitled Form",
     fields: [],
-    status: 'draft',
+    status: "draft",
     createdAt: new Date(),
     updatedAt: new Date(),
   },
@@ -71,7 +75,7 @@ export const useFormStore = create<FormStore>((set) => ({
       activeForm: state.activeForm
         ? {
             ...state.activeForm,
-            status: 'pending',
+            status: "pending",
             updatedAt: new Date(),
           }
         : null,
@@ -80,11 +84,46 @@ export const useFormStore = create<FormStore>((set) => ({
     set({
       activeForm: {
         id: crypto.randomUUID(),
-        name: 'Untitled Form',
+        name: "Untitled Form",
         fields: [],
-        status: 'draft',
+        status: "draft",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     }),
+  saveForm: async () => {
+    const state = get();
+    if (!state.activeForm) return;
+
+    try {
+      await formService.saveForm(state.activeForm);
+
+      // Update the forms array
+      set((state) => ({
+        forms: state.forms.some((f) => f.id === state.activeForm?.id)
+          ? state.forms.map((f) =>
+              f.id === state.activeForm?.id ? state.activeForm! : f
+            )
+          : [...state.forms, state.activeForm!],
+      }));
+
+      console.log("Form saved successfully");
+    } catch (error) {
+      console.error("Error saving form:", error);
+    }
+  },
+  loadForms: async () => {
+    try {
+      const forms = await formService.loadForms();
+      set({ forms });
+    } catch (error) {
+      console.error("Error loading forms:", error);
+    }
+  },
+  deleteForm: async (formId) => {
+    await formService.deleteForm(formId);
+    set((state) => ({
+      forms: state.forms.filter((f) => f.id !== formId),
+    }));
+  },
 }));
