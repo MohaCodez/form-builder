@@ -7,6 +7,7 @@ import {
   CheckSquare,
   Radio,
   AlignLeft,
+  Info,
 } from 'lucide-react';
 
 interface FieldPaletteItemProps {
@@ -64,6 +65,8 @@ export const FieldPalette: React.FC = () => {
       label: 'Checkbox',
     },
     { type: 'radio', icon: <Radio size={20} />, label: 'Radio Group' },
+    { type: 'title', icon: <Type size={20} />, label: 'Title' },
+    { type: 'formInformation', icon: <Info size={20} />, label: 'Form Information' },
   ];
 
   return (
