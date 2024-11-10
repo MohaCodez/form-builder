@@ -1,26 +1,37 @@
-export type FieldType = 'text' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'title' | 'formInformation';
+export type FieldType = 'text' | 'checkbox' | 'radio' | 'select' | 'date' | 'file';
 
 export interface FormField {
   id: string;
-  type: string;
+  type: FieldType;
   label: string;
+  required: boolean;
   placeholder?: string;
-  subtitle?: string;
-  required?: boolean;
-  options?: Option[]; // Ensure this is an array of Option objects
+  options?: string[];
+  validation?: {
+    pattern?: string;
+    minLength?: number;
+    maxLength?: number;
+  };
 }
 
 export interface Form {
   id: string;
-  name: string;
+  title: string;
+  description: string;
   fields: FormField[];
-  status: 'draft' | 'pending' | 'approved' | 'rejected';
+  status: 'draft' | 'finalized' | 'closed';
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface Option {
-  label: string;
-  value: string;
-  checked: boolean;
+export interface FormResponse {
+  id: string;
+  formId: string;
+  userId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
+  data: Record<string, any>;
+  comments?: string;
 }
