@@ -1,6 +1,9 @@
-import { Bell, Menu, Moon, Sun } from 'lucide-react';
+import { Bell, Menu, Moon, Sun, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { signOut } from '../../lib/auth';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../ui/Button';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -9,10 +12,20 @@ interface HeaderProps {
 export default function Header({ onMenuClick }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to sign out:', error);
+    }
   };
 
   return (
@@ -52,14 +65,24 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-700" />
 
           <div className="flex items-center gap-x-4 lg:gap-x-6">
-            <img
-              className="h-8 w-8 rounded-full bg-gray-50"
-              src={user?.photoURL || `https://ui-avatars.com/api/?name=${user?.email}`}
-              alt=""
-            />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              {user?.email}
-            </span>
+            <div className="flex items-center gap-2">
+              <img
+                className="h-8 w-8 rounded-full bg-gray-50"
+                src={user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.displayName || user?.email || '')}`}
+                alt={user?.displayName || 'User avatar'}
+              />
+              <span className="hidden lg:block text-sm font-medium text-gray-700 dark:text-gray-200">
+                {user?.displayName || user?.email}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              icon={<LogOut className="h-4 w-4" />}
+            >
+              Sign out
+            </Button>
           </div>
         </div>
       </div>
