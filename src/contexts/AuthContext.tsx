@@ -4,11 +4,12 @@ import { auth } from '../lib/firebase';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
 
 interface AuthContextType {
+  currentUser: User | null;
   user: User | null;
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ currentUser: null, user: null, loading: true });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ currentUser: user, user, loading }}>
       {children}
     </AuthContext.Provider>
   );

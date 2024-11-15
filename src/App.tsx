@@ -12,6 +12,8 @@ import FormResponses from './components/forms/FormResponses';
 import FormPreviewPage from './components/forms/FormPreviewPage';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import PublicForm from './components/forms/PublicForm';
+import FormSubmissions from './components/submissions/FormSubmissions';
+import SubmissionDetails from './components/submissions/SubmissionDetails';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -48,6 +50,10 @@ function App() {
                   <Route path="edit" element={<FormBuilder />} />
                   <Route path="preview" element={<FormPreviewPage />} />
                 </Route>
+              </Route>
+              <Route path="submissions">
+                <Route index element={<FormSubmissions />} />
+                <Route path=":responseId" element={<SubmissionDetails />} />
               </Route>
               <Route path="users" element={<div>User Management (Coming soon)</div>} />
               <Route path="settings" element={<div>Settings (Coming soon)</div>} />

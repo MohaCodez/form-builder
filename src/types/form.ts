@@ -26,6 +26,7 @@ export interface Form {
 
 export interface FormResponse {
   id: string;
+  formTitle: string;
   formId: string;
   userId: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -34,4 +35,5 @@ export interface FormResponse {
   reviewedBy?: string;
   data: Record<string, any>;
   comments?: string;
+  fields?: FormField[];
 }
