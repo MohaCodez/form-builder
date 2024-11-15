@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form } from '../../types/form';
-import { FileText, Edit2, Trash2, Eye } from 'lucide-react';
+import { FileText, Edit2, Trash2, Eye, Share2 } from 'lucide-react';
 import { format, isValid } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
@@ -32,6 +32,12 @@ export const FormCard: React.FC<FormCardProps> = ({ form, onDelete }) => {
     if (!date) return 'Date not available';
     const dateObj = date.toDate ? date.toDate() : new Date(date);
     return isValid(dateObj) ? format(dateObj, 'MMM d, yyyy') : 'Invalid date';
+  };
+
+  const shareForm = () => {
+    const shareUrl = `${window.location.origin}/f/${form.id}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Share link copied to clipboard!');
   };
 
   return (
@@ -81,6 +87,14 @@ export const FormCard: React.FC<FormCardProps> = ({ form, onDelete }) => {
             className="flex-1 min-w-[80px] text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
           >
             Delete
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={shareForm}
+            icon={<Share2 className="h-4 w-4" />}
+          >
+            Share
           </Button>
         </div>
       </div>

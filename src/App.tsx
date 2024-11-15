@@ -11,6 +11,7 @@ import FormList from './components/forms/FormList';
 import FormResponses from './components/forms/FormResponses';
 import FormPreviewPage from './components/forms/FormPreviewPage';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import PublicForm from './components/forms/PublicForm';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -52,6 +53,7 @@ function App() {
               <Route path="settings" element={<div>Settings (Coming soon)</div>} />
               <Route path="" element={<Navigate to="/dashboard" replace />} />
             </Route>
+            <Route path="/f/:formId" element={<PublicForm />} />
           </Routes>
           <Toaster position="top-right" />
         </AuthProvider>
