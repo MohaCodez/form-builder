@@ -6,6 +6,7 @@ import { Form } from '../../types/form';
 import { FormCard } from '../forms/FormCard';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 type ChangeType = 'positive' | 'negative' | 'neutral';
 
@@ -22,6 +23,7 @@ export default function Dashboard() {
     activeUsers: 0,
   });
   const [recentForms, setRecentForms] = useState<Form[]>([]);
+  const [recentResponses, setRecentResponses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -34,8 +36,10 @@ export default function Dashboard() {
         setLoading(true);
         const forms = (await getUserForms(user.uid)) as Form[];
         const responses = await getAllFormResponses(user.uid);
+        const recentResponses = responses.slice(0, 3);
         
         setRecentForms(forms.slice(0, 3));
+        setRecentResponses(recentResponses);
         setStats({
           totalForms: forms.length,
           totalResponses: responses.length,
@@ -196,7 +200,7 @@ export default function Dashboard() {
             Recent Activity
           </h3>
           <div className="space-y-4">
-            {stats.totalResponses === 0 ? (
+            {recentResponses.length === 0 ? (
               <div className="text-center py-6">
                 <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -207,8 +211,31 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                Recent form submissions will appear here
+              <div className="space-y-4">
+                {recentResponses.map((response) => (
+                  <div
+                    key={response.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {response.formTitle}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Submitted {format(response.submittedAt, 'PPp')}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate(`/submissions/${response.id}`)}
+                    >
+                      View
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
