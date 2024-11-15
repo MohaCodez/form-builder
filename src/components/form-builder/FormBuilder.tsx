@@ -34,7 +34,7 @@ export default function FormBuilder() {
       }
 
       try {
-        const formData = await getForm(formId);
+        const formData = await getForm(formId) as Form;
         if (formData) {
           setTitle(formData.title);
           setDescription(formData.description);

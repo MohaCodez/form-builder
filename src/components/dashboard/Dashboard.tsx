@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, FileText, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserForms } from '../../lib/forms';
+import { getUserForms, getAllFormResponses } from '../../lib/forms';
 import { Form } from '../../types/form';
 import { FormCard } from '../forms/FormCard';
 import { Button } from '../ui/Button';
 import { useNavigate } from 'react-router-dom';
+
+type ChangeType = 'positive' | 'negative' | 'neutral';
 
 interface DashboardStats {
   totalForms: number;
@@ -30,13 +32,14 @@ export default function Dashboard() {
 
       try {
         setLoading(true);
-        const forms = await getUserForms(user.uid);
+        const forms = (await getUserForms(user.uid)) as Form[];
+        const responses = await getAllFormResponses(user.uid);
         
         setRecentForms(forms.slice(0, 3));
         setStats({
           totalForms: forms.length,
-          totalResponses: forms.reduce((acc, form) => acc + (form.responses?.length || 0), 0),
-          activeUsers: 1, // Currently only showing the active user
+          totalResponses: responses.length,
+          activeUsers: 1,
         });
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -54,21 +57,21 @@ export default function Dashboard() {
       value: stats.totalForms, 
       icon: FileText,
       change: '+2.1%', 
-      changeType: 'positive' as const
+      changeType: 'positive' as ChangeType
     },
     { 
       name: 'Form Submissions', 
       value: stats.totalResponses, 
       icon: BarChart3,
       change: '+4.75%', 
-      changeType: 'positive' as const
+      changeType: 'positive' as ChangeType
     },
     { 
       name: 'Active Users', 
       value: stats.activeUsers, 
       icon: Users,
       change: '0%', 
-      changeType: 'neutral' as const
+      changeType: 'neutral' as ChangeType
     },
   ];
 
@@ -175,7 +178,7 @@ export default function Dashboard() {
                   form={form}
                   onDelete={async () => {
                     // Refresh dashboard data after deletion
-                    const forms = await getUserForms(user!.uid);
+                    const forms = (await getUserForms(user!.uid)) as Form[];
                     setRecentForms(forms.slice(0, 3));
                     setStats(prev => ({
                       ...prev,

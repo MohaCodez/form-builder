@@ -22,6 +22,7 @@ export interface Form {
   status: 'draft' | 'finalized' | 'closed';
   createdAt: Date;
   updatedAt: Date;
+  responses?: Array<any>;
 }
 
 export interface FormResponse {
