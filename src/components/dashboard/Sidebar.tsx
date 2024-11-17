@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Layout, FileText, Users, Settings, X, InboxIcon } from 'lucide-react';
+import { Layout, FileText, Users, Settings, X, InboxIcon, GitBranch } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface SidebarProps {
@@ -10,6 +10,7 @@ interface SidebarProps {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Layout },
   { name: 'Forms', href: '/forms', icon: FileText },
+  { name: 'Workflows', href: '/workflows', icon: GitBranch },
   { name: 'Submissions', href: '/submissions', icon: InboxIcon },
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Settings', href: '/settings', icon: Settings },

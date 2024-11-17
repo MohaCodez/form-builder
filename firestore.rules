@@ -14,5 +14,15 @@ service cloud.firestore {
           get(/databases/$(database)/documents/forms/$(formId)).data.createdBy == request.auth.uid;
       }
     }
+    
+    match /workflows/{workflowId} {
+      // Allow read/write if user is authenticated and owns the workflow
+      allow read, write: if request.auth != null && 
+        (
+          // Allow if user owns the workflow
+          (resource == null && request.resource.data.userId == request.auth.uid) ||
+          (resource != null && resource.data.userId == request.auth.uid)
+        );
+    }
   }
 } 

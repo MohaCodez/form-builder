@@ -14,6 +14,9 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import PublicForm from './components/forms/PublicForm';
 import FormSubmissions from './components/submissions/FormSubmissions';
 import SubmissionDetails from './components/submissions/SubmissionDetails';
+import WorkflowBuilder from './components/workflow-builder/WorkflowBuilder';
+import WorkflowList from './components/workflows/WorkflowList';
+import { WorkflowProvider } from './contexts/WorkflowContext';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -30,38 +33,45 @@ function App() {
     <ErrorBoundary>
       <Router>
         <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <DashboardLayout />
-                </PrivateRoute>
-              }
-            >
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="forms">
-                <Route index element={<FormList />} />
-                <Route path="new" element={<FormBuilder />} />
-                <Route path=":formId">
-                  <Route index element={<FormResponses />} />
-                  <Route path="edit" element={<FormBuilder />} />
-                  <Route path="preview" element={<FormPreviewPage />} />
+          <WorkflowProvider>
+            <Routes>
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/register" element={<RegisterForm />} />
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="forms">
+                  <Route index element={<FormList />} />
+                  <Route path="new" element={<FormBuilder />} />
+                  <Route path=":formId">
+                    <Route index element={<FormResponses />} />
+                    <Route path="edit" element={<FormBuilder />} />
+                    <Route path="preview" element={<FormPreviewPage />} />
+                  </Route>
                 </Route>
+                <Route path="submissions">
+                  <Route index element={<FormSubmissions />} />
+                  <Route path=":responseId" element={<SubmissionDetails />} />
+                </Route>
+                <Route path="users" element={<div>User Management (Coming soon)</div>} />
+                <Route path="settings" element={<div>Settings (Coming soon)</div>} />
+                <Route path="workflows">
+                  <Route index element={<WorkflowList />} />
+                  <Route path="new" element={<WorkflowBuilder />} />
+                  <Route path=":workflowId/edit" element={<WorkflowBuilder />} />
+                </Route>
+                <Route path="" element={<Navigate to="/dashboard" replace />} />
               </Route>
-              <Route path="submissions">
-                <Route index element={<FormSubmissions />} />
-                <Route path=":responseId" element={<SubmissionDetails />} />
-              </Route>
-              <Route path="users" element={<div>User Management (Coming soon)</div>} />
-              <Route path="settings" element={<div>Settings (Coming soon)</div>} />
-              <Route path="" element={<Navigate to="/dashboard" replace />} />
-            </Route>
-            <Route path="/f/:formId" element={<PublicForm />} />
-          </Routes>
-          <Toaster position="top-right" />
+              <Route path="/f/:formId" element={<PublicForm />} />
+            </Routes>
+            <Toaster position="top-right" />
+          </WorkflowProvider>
         </AuthProvider>
       </Router>
     </ErrorBoundary>
